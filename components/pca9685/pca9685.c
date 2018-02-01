@@ -220,6 +220,8 @@ esp_err_t setPWM(uint8_t num, uint16_t on, uint16_t off)
 
 /**
  * @brief      Gets the pwm of a pin detail
+ * 
+ * Have read each LED0_ON_L and LED0_OFF_L seperate
  *
  * @param[in]  num           The number
  * @param      dataReadOn0   The data read on 0
@@ -250,6 +252,27 @@ esp_err_t getPWMDetail(uint8_t num, uint8_t* dataReadOn0, uint8_t* dataReadOn1, 
     i2c_master_write_byte(cmd, PCA9685_ADDR << 1 | I2C_MASTER_READ, ACK_CHECK_EN);
     i2c_master_read_byte(cmd, dataReadOn0, ACK_VAL);
     i2c_master_read_byte(cmd, dataReadOn1, NACK_VAL);
+    i2c_master_stop(cmd);
+    ret = i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_RATE_MS);
+    i2c_cmd_link_delete(cmd);
+        if (ret != ESP_OK) {
+        return ret;
+    }
+
+    pinAddress = LED0_OFF_L + LED_MULTIPLYER * num;
+    cmd = i2c_cmd_link_create();
+    i2c_master_start(cmd);
+    i2c_master_write_byte(cmd, (PCA9685_ADDR << 1) | I2C_MASTER_WRITE, ACK_CHECK_EN);
+    i2c_master_write_byte(cmd, pinAddress, ACK_CHECK_EN);
+    i2c_master_stop(cmd);
+    ret = i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_RATE_MS);
+    i2c_cmd_link_delete(cmd);
+    if (ret != ESP_OK) {
+        return ret;
+    }
+    cmd = i2c_cmd_link_create();
+    i2c_master_start(cmd);
+    i2c_master_write_byte(cmd, PCA9685_ADDR << 1 | I2C_MASTER_READ, ACK_CHECK_EN);
     i2c_master_read_byte(cmd, dataReadOff0, ACK_VAL);
     i2c_master_read_byte(cmd, dataReadOff1, NACK_VAL);
     i2c_master_stop(cmd);

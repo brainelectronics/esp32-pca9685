@@ -172,7 +172,7 @@ void task_PCA9685(void *ignore)
                 printf("No ack, sensor not connected...skip...\n");
             }
 
-            vTaskDelay(100/portTICK_PERIOD_MS);
+            vTaskDelay(500/portTICK_PERIOD_MS);
 
             printf("Turn LED %d off\n", pin);
             setPWM(pin, 0, 4096);
