@@ -53,6 +53,10 @@ extern esp_err_t resetPCA9685(void);
 extern esp_err_t setFrequencyPCA9685(uint16_t freq);
 extern esp_err_t turnAllOff(void);
 extern esp_err_t setPWM(uint8_t num, uint16_t on, uint16_t off);
+extern esp_err_t getPWMDetail(uint8_t num, uint8_t* dataReadOn0, uint8_t* dataReadOn1, uint8_t* dataReadOff0, uint8_t* dataReadOff1);
+// extern esp_err_t getPWM(uint8_t num, uint16_t* dataReadOn, uint16_t* dataReadOff);
+// extern esp_err_t getPWM(uint8_t num);
+extern esp_err_t getPWM(uint8_t num, uint16_t* dataOn, uint16_t* dataOff);
 extern esp_err_t fade_pin_up_down(uint8_t pin);
 extern esp_err_t fade_all_up_down(void);
 

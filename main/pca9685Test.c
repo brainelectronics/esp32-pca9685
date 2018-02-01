@@ -94,7 +94,7 @@ void task_PCA9685(void *ignore)
     {
         // fade up and down each pin with static logarithmic table
         // see Weber Fechner Law
-        ret = fade_up_down();
+        ret = fade_all_up_down();
 
         if(ret == ESP_ERR_TIMEOUT)
         {
@@ -109,18 +109,72 @@ void task_PCA9685(void *ignore)
             printf("No ack, sensor not connected...skip...\n");
         }
 
-        vTaskDelay(100 / portTICK_RATE_MS);
+        vTaskDelay(1000 / portTICK_RATE_MS);
 
-        /*
-        // led turn on and 100ms off, starting from pin 0...15
+        printf("Blink all pins starting from 0\n");
+
         for (uint8_t pin = 0; pin < 16; pin++)
         {
-            printf("Turn LED on\n");
+            printf("Turn LED %d on\n", pin);
             setPWM(pin, 4096, 0);
+
+            if(ret == ESP_ERR_TIMEOUT)
+            {
+                printf("I2C timeout\n");
+            }
+            else if(ret == ESP_OK)
+            {
+                // all good
+            }
+            else
+            {
+                printf("No ack, sensor not connected...skip...\n");
+            }
 
             vTaskDelay(100/portTICK_PERIOD_MS);
 
-            printf("Turn LED off\n");
+            printf("Turn LED %d off\n", pin);
+            setPWM(pin, 0, 4096);
+        }
+
+        vTaskDelay(1000 / portTICK_RATE_MS);
+
+        /*
+        // led turn on and 100ms off, starting from pin 0...15
+        // read back the set value of each pin
+        for (uint8_t pin = 0; pin < 16; pin++)
+        {
+            printf("Turn LED %d on to H(%d) L(%d)\n", pin, 4096-pin, 0);
+            setPWM(pin, 4096-pin, 0);
+
+            uint8_t readPWMValueOn0;
+            uint8_t readPWMValueOn1;
+            uint8_t readPWMValueOff0;
+            uint8_t readPWMValueOff1;
+            uint16_t myDataOn;
+            uint16_t myDataOff;
+
+            ret = getPWMDetail(pin, &readPWMValueOn0, &readPWMValueOn1, &readPWMValueOff0, &readPWMValueOff1);
+            ret = getPWM(pin, &myDataOn, &myDataOff);
+
+            if(ret == ESP_ERR_TIMEOUT)
+            {
+                printf("I2C timeout\n");
+            }
+            else if(ret == ESP_OK)
+            {
+                printf("Read back from device detail: H(%d %d), L(%d %d)\n", readPWMValueOn0, readPWMValueOn1, readPWMValueOff0, readPWMValueOff1);
+
+                printf("Read back from device: H(%d) L(%d)\n", myDataOn, myDataOff);
+            }
+            else
+            {
+                printf("No ack, sensor not connected...skip...\n");
+            }
+
+            vTaskDelay(100/portTICK_PERIOD_MS);
+
+            printf("Turn LED %d off\n", pin);
             setPWM(pin, 0, 4096);
         }
         */

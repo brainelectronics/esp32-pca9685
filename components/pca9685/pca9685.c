@@ -219,6 +219,73 @@ esp_err_t setPWM(uint8_t num, uint16_t on, uint16_t off)
 }
 
 /**
+ * @brief      Gets the pwm of a pin detail
+ *
+ * @param[in]  num           The number
+ * @param      dataReadOn0   The data read on 0
+ * @param      dataReadOn1   The data read on 1
+ * @param      dataReadOff0  The data read off 0
+ * @param      dataReadOff1  The data read off 1
+ *
+ * @return     result of command
+ */
+esp_err_t getPWMDetail(uint8_t num, uint8_t* dataReadOn0, uint8_t* dataReadOn1, uint8_t* dataReadOff0, uint8_t* dataReadOff1)
+{
+    esp_err_t ret;
+
+    uint8_t pinAddress = LED0_ON_L + LED_MULTIPLYER * num;
+
+    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+    i2c_master_start(cmd);
+    i2c_master_write_byte(cmd, (PCA9685_ADDR << 1) | I2C_MASTER_WRITE, ACK_CHECK_EN);
+    i2c_master_write_byte(cmd, pinAddress, ACK_CHECK_EN);
+    i2c_master_stop(cmd);
+    ret = i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_RATE_MS);
+    i2c_cmd_link_delete(cmd);
+    if (ret != ESP_OK) {
+        return ret;
+    }
+    cmd = i2c_cmd_link_create();
+    i2c_master_start(cmd);
+    i2c_master_write_byte(cmd, PCA9685_ADDR << 1 | I2C_MASTER_READ, ACK_CHECK_EN);
+    i2c_master_read_byte(cmd, dataReadOn0, ACK_VAL);
+    i2c_master_read_byte(cmd, dataReadOn1, NACK_VAL);
+    i2c_master_read_byte(cmd, dataReadOff0, ACK_VAL);
+    i2c_master_read_byte(cmd, dataReadOff1, NACK_VAL);
+    i2c_master_stop(cmd);
+    ret = i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_RATE_MS);
+    i2c_cmd_link_delete(cmd);
+
+    return ret;
+}
+
+/**
+ * @brief      Gets the pwm of a pin
+ *
+ * @param[in]  num      The number
+ * @param      dataOn   The data on
+ * @param      dataOff  The data off
+ *
+ * @return     result of command
+ */
+esp_err_t getPWM(uint8_t num, uint16_t* dataOn, uint16_t* dataOff)
+{
+    esp_err_t ret;
+
+    uint8_t readPWMValueOn0;
+    uint8_t readPWMValueOn1;
+    uint8_t readPWMValueOff0;
+    uint8_t readPWMValueOff1;
+
+    ret = getPWMDetail(num, &readPWMValueOn0, &readPWMValueOn1, &readPWMValueOff0, &readPWMValueOff1);
+
+    *dataOn = (readPWMValueOn1 << 8) | readPWMValueOn0;
+    *dataOff = (readPWMValueOff1 << 8) | readPWMValueOff0;
+
+    return ret;
+}
+
+/**
  * @brief      Turn all LEDs off
  * 
  * @return     result of command
