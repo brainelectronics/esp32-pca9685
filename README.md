@@ -6,6 +6,7 @@ This is a example for the 16-channel PWM & Servo driver PCA9585
 
 #### Connections
 | ESP32 pin | PCA9685 | Notes |
+| --------- | ------- | ----- |
 | Any output pin | SCL | currenty pin 4 is used |
 | Any output pin | SDA | currenty pin 5 is used |
 | GND | GND  | Power supply ground |
