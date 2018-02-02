@@ -60,8 +60,11 @@ extern esp_err_t getPWM(uint8_t num, uint16_t* dataOn, uint16_t* dataOff);
 extern esp_err_t fade_pin_up_down(uint8_t pin);
 extern esp_err_t fade_all_up_down(void);
 
-extern esp_err_t write_i2c_register_two_words(uint8_t regaddr, uint16_t valueOn, uint16_t valueOff);
+extern esp_err_t generic_write_i2c_register_two_words(uint8_t regaddr, uint16_t valueOn, uint16_t valueOff);
 extern esp_err_t generic_write_i2c_register_word(uint8_t regaddr, uint16_t value);
+extern esp_err_t generic_write_i2c_register(uint8_t regaddr, uint8_t value);
+extern esp_err_t generic_read_i2c_register_word(uint8_t regaddr, uint16_t* value);
+extern esp_err_t generic_read_two_i2c_register(uint8_t regaddr, uint8_t* valueA, uint8_t* valueB);
 extern void disp_buf(uint16_t* buf, uint8_t len);
 
 #endif /* PCA9685_DRIVER_H */
